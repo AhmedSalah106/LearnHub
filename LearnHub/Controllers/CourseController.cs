@@ -8,11 +8,10 @@ namespace LearnHub.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentController : ControllerBase
+    public class CourseController : ControllerBase
     {
-
         private readonly LearnHubContext context;
-        public StudentController(LearnHubContext context)
+        public CourseController(LearnHubContext context)
         {
             this.context = context;
         }
@@ -20,30 +19,24 @@ namespace LearnHub.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            List<Student> students = context.Students.ToList();
-
-            return Ok(students);
+            List<Course> courses = context.Courses.ToList();
+            return Ok(courses);
         }
 
         [HttpPost]
-        public IActionResult AddStudent(Student student)
+        public IActionResult AddCourse(Course course)
         {
             try
             {
-                if (ModelState.IsValid)
+                if(!ModelState.IsValid)
                 {
-                    Department DepartmentExists = context.Departments.FirstOrDefault(x => x.Id == student.DepartmentId);
-                    if (DepartmentExists == null)
-                    {
-                        return BadRequest("Invalid DepartmentId , this Department does not exist.");
-                    }
-                    context.Students.Add(student);
-                    context.SaveChanges();
-                    return Ok(new { Message = "Studnet Added Successfully" });
+                    return BadRequest(ModelState);
                 }
-                return BadRequest(ModelState);
 
+                context.Courses.Add(course);
+                context.SaveChanges();
 
+                return Ok(new { Message = $"Couse {course.Name} was added Successfully" });
             }
             catch (DbUpdateException ex)
             {
@@ -53,7 +46,6 @@ namespace LearnHub.Controllers
             {
                 return StatusCode(500, "An unexpected error occurred: " + ex.Message);
             }
-
         }
     }
 }

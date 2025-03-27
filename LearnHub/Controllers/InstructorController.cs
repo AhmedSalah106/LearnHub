@@ -7,33 +7,34 @@ namespace LearnHub.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DepartmentController : ControllerBase
+    public class InstructorController : ControllerBase
     {
         private readonly LearnHubContext context;
-
-        public DepartmentController(LearnHubContext context)
+        public InstructorController(LearnHubContext context)
         {
             this.context = context;
         }
+
         [HttpGet]
         public IActionResult Index()
         {
-            List<Department> departments = context.Departments.ToList();
-            return Ok(departments);
+            List<Instructor> Instructors = context.Instructors.ToList();
+            return Ok(Instructors);
         }
-
         [HttpPost]
-        public IActionResult AddDepartment(Department department)
+        public IActionResult AddInstructor(Instructor instructor)
         {
             try
             {
-                if (ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
-                    context.Departments.Add(department);
-                    context.SaveChanges();
-                    return Ok();
+                    return BadRequest(ModelState);
                 }
-                return BadRequest(ModelState);
+
+                context.Add(instructor);
+                context.SaveChanges();
+
+                return Ok(new { Message = $"instructor {instructor.FirstName} {instructor.LastName} was added successfully" });
             }
             catch (Exception ex)
             {

@@ -8,11 +8,10 @@ namespace LearnHub.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentController : ControllerBase
+    public class CourseResultController : ControllerBase
     {
-
         private readonly LearnHubContext context;
-        public StudentController(LearnHubContext context)
+        public CourseResultController(LearnHubContext context)
         {
             this.context = context;
         }
@@ -20,30 +19,30 @@ namespace LearnHub.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            List<Student> students = context.Students.ToList();
-
-            return Ok(students);
+            List<CourseResult> courseResults = context.CourseResults.ToList();
+            return Ok(courseResults);
         }
 
         [HttpPost]
-        public IActionResult AddStudent(Student student)
+        public IActionResult AddCourseResult(CourseResult courseResult)
         {
             try
             {
-                if (ModelState.IsValid)
+                if(!ModelState.IsValid)
                 {
-                    Department DepartmentExists = context.Departments.FirstOrDefault(x => x.Id == student.DepartmentId);
-                    if (DepartmentExists == null)
-                    {
-                        return BadRequest("Invalid DepartmentId , this Department does not exist.");
-                    }
-                    context.Students.Add(student);
-                    context.SaveChanges();
-                    return Ok(new { Message = "Studnet Added Successfully" });
+                    return BadRequest(ModelState);
                 }
-                return BadRequest(ModelState);
 
+                Course CourseExists = context.Courses.SingleOrDefault(c => c.Id == courseResult.CourseId);
+                if (CourseExists == null)
+                {
+                    return BadRequest("Invalid CourseId , this Course does not exist.");
+                }
 
+                context.CourseResults.Add(courseResult);
+                context.SaveChanges();
+
+                return Ok(new { Message = "Result Was Added Successfully}" });
             }
             catch (DbUpdateException ex)
             {
@@ -53,7 +52,6 @@ namespace LearnHub.Controllers
             {
                 return StatusCode(500, "An unexpected error occurred: " + ex.Message);
             }
-
         }
     }
 }
