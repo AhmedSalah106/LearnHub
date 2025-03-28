@@ -1,5 +1,6 @@
 ﻿using LearnHub.Models;
 using LearnHub.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ namespace LearnHub.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles ="Admin")]
     public class DepartmentController : ControllerBase
     {
         private readonly LearnHubContext context;
