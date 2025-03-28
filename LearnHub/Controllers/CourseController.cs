@@ -47,5 +47,66 @@ namespace LearnHub.Controllers
                 return StatusCode(500, "An unexpected error occurred: " + ex.Message);
             }
         }
+
+        [HttpPut("Update")]
+        public IActionResult UpdateCourse(int Id, Course UpdatedCourse)
+        {
+
+            try
+            {
+
+                if(!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                Course CourseExists = context.Courses.FirstOrDefault(c => c.Id == Id);
+
+                if(CourseExists == null)
+                {
+                    return NotFound($"Course With Id {Id} Not Found");
+                }
+
+                CourseExists.Name = UpdatedCourse.Name;
+                CourseExists.MinDegree = UpdatedCourse.MinDegree;
+                CourseExists.Degree = UpdatedCourse.Degree;
+
+                context.SaveChanges();
+
+                return Ok(new {Message = $"Course {CourseExists.Name} Was Successfully Updated"});
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred: " + ex.Message);
+            }
+        }
+
+        [HttpDelete("Delete")]
+        public IActionResult DeleteCourse(int Id)
+        {
+            try
+            {
+                if(!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                Course CourseExists = context.Courses.FirstOrDefault(C => C.Id == Id);
+                if (CourseExists == null)
+                {
+                    return NotFound($"No Course With Id: {CourseExists.Id} Founded");
+                }
+
+                context.Courses.Remove(CourseExists);
+                context.SaveChanges();
+
+                return Ok(new { Message = $"Course {CourseExists.Name} Was Deleted Successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred: " + ex.Message);
+            }
+        }
     }
 }
