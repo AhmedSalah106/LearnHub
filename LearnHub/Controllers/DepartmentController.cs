@@ -44,7 +44,7 @@ namespace LearnHub.Controllers
         }
 
 
-        [HttpPost("Update")]
+        [HttpPut("Update")]
         public IActionResult UpdateDepartment(int Id, Department UpdatedDepartment)
         {
             try
@@ -77,5 +77,36 @@ namespace LearnHub.Controllers
                 return StatusCode(500, "An unexpected error occurred: " + ex.Message);
             }
         }
+
+        [HttpDelete("Delete")]
+        public IActionResult DeleteDepartment(int Id)
+        {
+
+            try
+            {
+                if(!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                Department DepartmentExists = context.Departments.FirstOrDefault(d=>d.Id==Id);
+
+                if(DepartmentExists == null)
+                {
+                    return NotFound($"No Department With Id : {Id}");
+                }
+
+                context.Departments.Remove(DepartmentExists);
+                context.SaveChanges();
+
+                return Ok($"Department {DepartmentExists.Name} Was Deleted Successfully");
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred: " + ex.Message);
+            }
+        }
+
     }
 }

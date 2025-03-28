@@ -1,6 +1,7 @@
 ﻿using LearnHub.Models;
 using LearnHub.Repositories;
 using LearnHub.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ namespace LearnHub.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class StudentController : ControllerBase
     {
 
@@ -32,6 +34,7 @@ namespace LearnHub.Controllers
 
 
         [HttpPost("Add")]
+        
         public IActionResult AddStudent(Student student)
         {
             try
@@ -43,8 +46,10 @@ namespace LearnHub.Controllers
                     {
                         return BadRequest("Invalid DepartmentId , this Department does not exist.");
                     }
+
                     studentRepository.Insert(student);
                     studentRepository.Save();
+
                     return Ok(new { Message = $"Studnet {student.FirstName} {student.LastName} Added Successfully" });
                 }
                 return BadRequest(ModelState);
@@ -63,7 +68,7 @@ namespace LearnHub.Controllers
         }
 
 
-        [HttpPost("Update")]
+        [HttpPut("Update")]
         public IActionResult UpdateStudent(int Id, Student UpdatedStudent)
         {
             try
@@ -99,6 +104,35 @@ namespace LearnHub.Controllers
 
         }
 
+
+        [HttpDelete("Delete")]
+        public IActionResult DeleteStudent(int Id)
+        {
+            try
+            {
+                if(!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+
+                Student student = studentRepository.GetById(Id);
+
+                if(student == null)
+                {
+                    return NotFound($"No Student with Id : {Id}");
+                }
+
+                studentRepository.Delete(student);
+                studentRepository.Save();
+
+                return Ok(new { Message = $"Student {student.FirstName} {student.LastName} Was Deleted Successfully"});
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred: " + ex.Message);
+            }
+        }
         
     }
 }
